@@ -1,20 +1,22 @@
+const metadata = {"k-means-was-run": false };
+
 const mainSection = d3.select("#main-section")
   .append("svg")
     .style("outline", "3px solid black")
     .style("background-color", "#87ceeb")
     .attr("width", 1024)
     .attr("height", 640)
-      .append("text")
-        .attr("x", 1024 * 0.5)
-        .attr("y", 640 * 0.5)
-        .attr("font-size", 32)
-        .attr("transform", "translate(-250, 0)")
-        .style("user-select", "none")
-        .text("Please fetch data to visualize.");
+    .append("text")
+      .attr("x", 1024 * 0.5)
+      .attr("y", 640 * 0.5)
+      .attr("font-size", 32)
+      .attr("transform", "translate(-250, 0)")
+      .style("user-select", "none")
+      .text("Please fetch data to visualize.");
 
 
 const mainSVG = d3.select("#main-section").select("svg");
-const metadata = {};
+
 d3.select("#button-k-means").attr("disabled", true);
 
 
@@ -35,6 +37,7 @@ function fn_fetchData(url) {
       d3.select("#button-k-means").attr("disabled", null);
 
       mainSVG.selectAll("*").remove();
+      metadata["k-means-was-run"] = false;
 
       mainSVG
         .append("text")
@@ -71,8 +74,21 @@ function fn_fetchData(url) {
             .attr("fill", "black")
             .style("stroke", "red")
             .style("stroke-width", 0)
-            .on("mouseenter", function() { d3.select(this).style("stroke-width", 10); })
-            .on("mouseleave", function() { d3.select(this).style("stroke-width", 0); });
+            .on("mouseenter", function(d, i) { d3.select(this).style("stroke-width", 10); })
+            .on("mouseleave", function(d, i) {
+              const curCircle = d3.select(this);
+              d3.select(this).style("stroke-width", 0);
+            })
+            .call(d3.drag()
+              .on("start", function(d) { })
+              .on("drag", function(d) {
+                d3.select(this).attr("cx", d.x = d3.pointer(event, this)[0]);
+                d3.select(this).attr("cy", d.y = d3.pointer(event, this)[1]);
+              })
+              .on("end", function(d) {
+                if (metadata["k-means-was-run"]) { fn_runKMeans(); }
+              })
+            );
     });
 }
 
@@ -85,12 +101,33 @@ function fn_runKMeans() {
   k = Math.min(k, 4);
   k = Math.max(k, 2);
 
+  const data = mainSVG.selectAll("circle").data();
 
-  fetch("http://127.0.0.1:8000/k-means/" + metadata["loaded_data"] + "?k=" + k)
+  mainSVG
+    .selectAll("circle")
+    .each(function(d, i) {
+      data[i][0] = d3.select(this).attr("cx");
+      data[i][1] = d3.select(this).attr("cy");
+    });
+
+  const headers = {
+    method: "POST",
+    mode: "cors",
+    cache: "no-cache",
+    credentials: "same-origin",
+    headers: { "Content-Type": "application/json" },
+    redirect: "follow",
+    referrerPolicy: "no-referrer",
+    body: JSON.stringify({"data": data, "k": k }),
+  }
+
+  fetch("http://127.0.0.1:8000/k-means", headers)
     .then(function(response) { return response.json(); } )
     .then(function(data) {
       const cluster_ids = data["cluster_ids"];
       const edges = data["mst"];
+
+      metadata["k-means-was-run"] = true;
 
       mainSVG.selectAll("line").remove();
       mainSVG.selectAll("g").select("text").remove();
@@ -101,8 +138,8 @@ function fn_runKMeans() {
 
       mainSVG.selectAll("g")
         .append("text")
-          .attr("x", function() { return d3.select(this.parentNode).select("circle").attr("cx"); })
-          .attr("y", function() { return d3.select(this.parentNode).select("circle").attr("cy"); })
+          .attr("x", function() { return d3.select(this.parentNode).select("circle").attr("cx") - 10; })
+          .attr("y", function() { return d3.select(this.parentNode).select("circle").attr("cy") - 16; })
           .attr("font-size", 16)
           .attr("fill", "black")
           .style("user-select", "none")

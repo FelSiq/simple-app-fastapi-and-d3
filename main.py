@@ -7,6 +7,7 @@ import pandas as pd
 import sklearn.cluster
 import scipy.spatial
 import scipy.sparse.csgraph
+import pydantic
 
 
 app = fastapi.FastAPI()
@@ -35,10 +36,15 @@ async def get_data(dataset_name: str):
     return {"data": df.values.tolist(), "range_max": max_, "range_min": min_}
 
 
-@app.get("/k-means/{dataset_name}")
-async def get_data(dataset_name: str, k: int = 3):
-    dataset_uri = os.path.abspath(f"./d3test/data/{dataset_name}.csv")
-    df = pd.read_csv(dataset_uri, sep=",")
+class KMeansDataPack(pydantic.BaseModel):
+    data: list[tuple[float, float]]
+    k: int = 3
+
+
+@app.post("/k-means")
+async def get_data(data_pack: KMeansDataPack):
+    k = data_pack.k
+    data = np.asfarray(data_pack.data)
 
     clusterer = sklearn.cluster.KMeans(
         n_clusters=k,
@@ -47,7 +53,7 @@ async def get_data(dataset_name: str, k: int = 3):
         random_state=16,
     )
 
-    cluster_ids = clusterer.fit_predict(df.values)
+    cluster_ids = clusterer.fit_predict(data)
     cluster_ids = cluster_ids.astype(int, copy=False)
     cluster_ids = cluster_ids.ravel().tolist()
 
@@ -61,7 +67,7 @@ async def get_data(dataset_name: str, k: int = 3):
         if cls_inds.size <= 1:
             continue
 
-        subset = df.iloc[cls_inds, :].values
+        subset = data[cls_inds, :]
 
         dist_mat = scipy.spatial.distance.cdist(subset, subset)
         span_tree = scipy.sparse.csgraph.minimum_spanning_tree(dist_mat, overwrite=True)
