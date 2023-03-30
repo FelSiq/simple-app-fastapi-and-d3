@@ -1,4 +1,4 @@
-const metadata = {"k-means-was-run": false };
+const metadata = {"loaded-data": null, "k-means-was-run": false };
 
 const mainSection = d3.select("#main-section")
   .append("svg")
@@ -163,6 +163,10 @@ d3.select("#button-k-means")
   .style("color", "white")
   .style("font-size", "16px")
   .on("click", function() { fn_runKMeans(); });
+
+
+d3.select("#k-value")
+  .on("input", function() { if (metadata["k-means-was-run"]) { fn_runKMeans(); } });
 
 
 d3.select("#button-data-01")
