@@ -2,8 +2,11 @@ import os
 
 import fastapi
 import fastapi.middleware.cors
+import numpy as np
 import pandas as pd
 import sklearn.cluster
+import scipy.spatial
+import scipy.sparse.csgraph
 
 
 app = fastapi.FastAPI()
@@ -36,13 +39,36 @@ async def get_data(dataset_name: str):
 async def get_data(dataset_name: str, k: int = 3):
     dataset_uri = os.path.abspath(f"./d3test/data/{dataset_name}.csv")
     df = pd.read_csv(dataset_uri, sep=",")
+
     clusterer = sklearn.cluster.KMeans(
         n_clusters=k,
         init="k-means++",
         n_init="auto",
         random_state=16,
-        copy_x=False,
     )
-    cluster_ids = clusterer.fit_predict(df)
+
+    cluster_ids = clusterer.fit_predict(df.values)
+    cluster_ids = cluster_ids.astype(int, copy=False)
     cluster_ids = cluster_ids.ravel().tolist()
-    return {"cluster_ids": cluster_ids}
+
+    ids = np.unique(cluster_ids)
+
+    mst = []
+
+    for i in ids:
+        cls_inds = np.flatnonzero(cluster_ids == i)
+
+        if cls_inds.size <= 1:
+            continue
+
+        subset = df.iloc[cls_inds, :].values
+
+        dist_mat = scipy.spatial.distance.cdist(subset, subset)
+        span_tree = scipy.sparse.csgraph.minimum_spanning_tree(dist_mat, overwrite=True)
+        ids_a, ids_b, weights = scipy.sparse.find(span_tree)
+
+        mst.extend(zip(cls_inds[ids_a], cls_inds[ids_b], weights))
+
+    mst = [(int(ia), int(ib), float(w)) for ia, ib, w in mst]
+
+    return {"cluster_ids": cluster_ids, "mst": mst}

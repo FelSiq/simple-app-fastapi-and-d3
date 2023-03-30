@@ -22,9 +22,7 @@ function fn_fetchData(url) {
   fetch(url)
     .then(function (response) { return response.json(); })
     .then(function (data) {
-      points = data["data"];
-
-      d3.select("#button-k-means").attr("disabled", null);
+      const points = data["data"];
 
       const x_max = data["range_max"][0];
       const x_min = data["range_min"][0];
@@ -33,6 +31,8 @@ function fn_fetchData(url) {
       const y_max = data["range_max"][1];
       const y_min = data["range_min"][1];
       const y_ptp = y_max - y_min;
+
+      d3.select("#button-k-means").attr("disabled", null);
 
       mainSVG.selectAll("*").remove();
 
@@ -64,8 +64,9 @@ function fn_fetchData(url) {
         .data(points).enter()
         .append("g")
           .append("circle")
-            .attr("cx", function(d, i) {return ((d[0] - x_min) / x_ptp * (0.90 - 0.10) + 0.10 ) * mainSVG.attr("width"); })
-            .attr("cy", function(d, i) {return ((d[1] - y_min) / y_ptp * (0.90 - 0.10) + 0.10 ) * mainSVG.attr("height"); })
+            .attr("id", function(d, i) { return "svg-p-" + i; })
+            .attr("cx", function(d, i) { return ((d[0] - x_min) / x_ptp * (0.90 - 0.10) + 0.10 ) * mainSVG.attr("width"); })
+            .attr("cy", function(d, i) { return ((d[1] - y_min) / y_ptp * (0.90 - 0.10) + 0.10 ) * mainSVG.attr("height"); })
             .attr("r", 16)
             .attr("fill", "black")
             .style("stroke", "red")
@@ -84,12 +85,16 @@ function fn_runKMeans() {
   k = Math.min(k, 4);
   k = Math.max(k, 2);
 
-  console.log("k", k);
 
   fetch("http://127.0.0.1:8000/k-means/" + metadata["loaded_data"] + "?k=" + k)
     .then(function(response) { return response.json(); } )
     .then(function(data) {
       const cluster_ids = data["cluster_ids"];
+      const edges = data["mst"];
+
+      mainSVG.selectAll("line").remove();
+      mainSVG.selectAll("g").select("text").remove();
+
       mainSVG.selectAll("g")
         .select("circle")
           .style("fill", function(d, i) { return colors[cluster_ids[i]]; });
@@ -102,6 +107,16 @@ function fn_runKMeans() {
           .attr("fill", "black")
           .style("user-select", "none")
           .text(function(d, i) { return ("[" + cluster_ids[i] + "]"); });
+
+      mainSVG.selectAll("line")
+        .data(edges).enter()
+          .insert("line", "g")
+            .attr("x1", function(d, i) { return d3.select("#svg-p-" + d[0]).attr("cx"); })
+            .attr("x2", function(d, i) { return d3.select("#svg-p-" + d[1]).attr("cx"); })
+            .attr("y1", function(d, i) { return d3.select("#svg-p-" + d[0]).attr("cy"); })
+            .attr("y2", function(d, i) { return d3.select("#svg-p-" + d[1]).attr("cy"); })
+            .style("stroke", function(d, i) { return colors[cluster_ids[d[0]]]; })
+            .style("stroke-width", 3);
     });
 }
 
