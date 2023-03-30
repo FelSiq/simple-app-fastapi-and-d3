@@ -15,6 +15,7 @@ const mainSection = d3.select("#main-section")
 
 const mainSVG = d3.select("#main-section").select("svg");
 const metadata = {};
+d3.select("#button-k-means").attr("disabled", true);
 
 
 function fn_fetchData(url) {
