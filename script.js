@@ -72,12 +72,24 @@ function fn_fetchData(url) {
             .attr("cy", function(d, i) { return ((d[1] - y_min) / y_ptp * (0.90 - 0.10) + 0.10 ) * mainSVG.attr("height"); })
             .attr("r", 16)
             .attr("fill", "black")
-            .style("stroke", "red")
-            .style("stroke-width", 0)
-            .on("mouseenter", function(d, i) { d3.select(this).style("stroke-width", 10); })
-            .on("mouseleave", function(d, i) {
-              const curCircle = d3.select(this);
-              d3.select(this).style("stroke-width", 0);
+            .style("stroke", "white")
+            .on("mouseover", function() {
+              d3.select(this)
+                .transition()
+                  .duration(100)
+                  .attr("r", 20)
+                .transition()
+                  .duration(100)
+                  .attr("stroke-width", 6);
+            })
+            .on("mouseout", function() {
+              d3.select(this)
+                .transition()
+                  .duration(100)
+                  .attr("r", 16)
+                .transition()
+                  .duration(100)
+                  .attr("stroke-width", 1);
             })
             .call(d3.drag()
               .on("start", function(d) { })
