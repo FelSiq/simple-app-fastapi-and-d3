@@ -1,0 +1,30 @@
+[build-system]
+requires = ["flit_core >=3.2,<4"]
+build-backend = "flit_core.buildapi"
+
+[project]
+name = "d3test"
+authors = [{name = "Name", email = "email@usp.br"}]
+dynamic = ["version", "description"]
+requires-python = ">=3.6"
+readme = "README.md"
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+]
+dependencies = [
+    "fastapi >= 0.95.0,<1",
+    "uvicorn[standard] >= 0.21.1,<1",
+    "numpy>=1.24.2,<2",
+    "pandas>=1.5.3,<2",
+    "scikit-learn>=1.2.2,<2",
+    "importlib-metadata; python_version < '3.8'",
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest >= 2.7.3",
+    "pytest-cov",
+]
+
+[project.urls]
+Home = "https://github.com/"

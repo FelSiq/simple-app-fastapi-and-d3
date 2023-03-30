@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>D3 Test</title>
+  <link rel="stylesheet" href="css/main.css">
+</head>  
+<body>
+  <div id="tool-bar">
+    <button type="button" id="button-data-01"> Fetch test data 01 </button>
+    <button type="button" id="button-data-02"> Fetch test data 02 </button>
+    <span style="margin-left: 64px;"></span>
+
+    <button type="button" id="button-k-means" disabled> Run k-means </button>
+    <label for="k-value" style="margin: 8px 8px 8px 8px;">Select a K (2, 3, or 4):</label>
+    <input type="number" name="k-value" min="2", max="4" id="k-value" style="width: 48px; font-size: 16px;">
+  </div>
+  <div id="main-section"> </div>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

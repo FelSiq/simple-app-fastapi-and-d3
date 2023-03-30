@@ -1,0 +1,19 @@
+body {
+  font-size: 16px;
+}
+
+button {
+  border-color: black;
+  border-width: 1px;
+  color: black;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  border-radius: 4px;
+  margin-bottom: 16px;
+}
+
+button:disabled {
+  background-color: gray !important;
+}
