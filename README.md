@@ -1,15 +1,15 @@
 # D3 Demo
 
-## Resources
+## :black_circle: Resources
 - [Backend: FastAPI](https://fastapi.tiangolo.com/)
 - [Frontend: D3](https://d3js.org/)
 
-## Other useful links
+## :white_circle: Other useful links
 - [Older Random Forest visualization tool (Nyata)](https://github.com/FelSiq/nyata-random-forest-visualization)
 - [Our Python Dev Guide](https://www.overleaf.com/read/ffwksqdxmfkx)
 
-## Install
-- Always develop within a virtual environment, preventing dependency version conflicts:
+## :large_blue_circle: Install
+- Always develop within a virtual environment to prevent dependency version conflicts:
 ```bash
 python -m venv venv
 source venv/bin/activate
@@ -25,7 +25,9 @@ python -m pip install -U pip
 python -m pip install -e "."
 ```
 
-## Run
+## :red_circle: Run
+After installing, start the backend in debugging mode:
 ```bash
 python -m uvicorn main:app --reload
 ```
+Then, open `index.html` using your favorite web browser. :rocket:
