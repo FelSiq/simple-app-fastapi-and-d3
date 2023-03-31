@@ -73,6 +73,7 @@ function fn_fetchData(url) {
             .attr("r", 16)
             .attr("fill", "black")
             .style("stroke", "white")
+            .style("cursor", "grab")
             .on("mouseover", function() {
               d3.select(this)
                 .transition()
@@ -92,12 +93,13 @@ function fn_fetchData(url) {
                   .attr("stroke-width", 1);
             })
             .call(d3.drag()
-              .on("start", function(d) { })
+              .on("start", function(d) { d3.select(this).style("cursor", "grabbing"); })
               .on("drag", function(d) {
-                d3.select(this).attr("cx", d.x = d3.pointer(event, this)[0]);
-                d3.select(this).attr("cy", d.y = d3.pointer(event, this)[1]);
+                d3.select(this).attr("cx", Math.min(1024, Math.max(0, d.x = d3.pointer(event, this)[0])));
+                d3.select(this).attr("cy", Math.min(640, Math.max(0, d.y = d3.pointer(event, this)[1])));
               })
               .on("end", function(d) {
+                d3.select(this).style("cursor", "grab");
                 if (metadata["k-means-was-run"]) { fn_runKMeans(); }
               })
             );
