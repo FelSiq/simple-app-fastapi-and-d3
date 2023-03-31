@@ -3,7 +3,7 @@ const metadata = {"loaded-data": null, "k-means-was-run": false };
 const mainSection = d3.select("#main-section")
   .append("svg")
     .style("outline", "3px solid black")
-    .style("background-color", "#87ceeb")
+    .style("background-color", "#a2b8e1")
     .attr("width", 1024)
     .attr("height", 640)
     .append("text")
@@ -110,7 +110,8 @@ function fn_fetchData(url) {
 function fn_runKMeans() {
   if (!metadata["loaded_data"]) { return; }
 
-  const colors = ["red", "blue", "green", "purple"];
+  const colors = ["#d55e00", "#cc79a7", "#0072b2", "#f0e442", "#009e73"];
+
   let k = +d3.select("#k-value").property("value");
   k = Math.min(k, 4);
   k = Math.max(k, 2);
