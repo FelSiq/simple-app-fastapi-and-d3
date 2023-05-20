@@ -1,12 +1,9 @@
 # D3 Demo
+![Example overview](assets/overview.png "Overview")
 
 ## :black_circle: Resources
 - [Backend: FastAPI](https://fastapi.tiangolo.com/)
 - [Frontend: D3](https://d3js.org/)
-
-## :white_circle: Other useful links
-- [Older Random Forest visualization tool (Nyata)](https://github.com/FelSiq/nyata-random-forest-visualization)
-- [Our Python Dev Guide](https://www.overleaf.com/read/ffwksqdxmfkx)
 
 ## :large_blue_circle: Install
 - Always develop within a virtual environment to prevent dependency version conflicts:
